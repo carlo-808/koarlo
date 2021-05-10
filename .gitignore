@@ -1,2 +1,5 @@
 node_modules
 newrelic.js
+*.log
+*.cpuprofile
+.DS_Store

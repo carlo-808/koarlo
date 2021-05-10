@@ -1,12 +1,30 @@
 'use strict'
 
+// const newrelic = require('newrelic')
 const Koa = require('koa')
 const app = new Koa()
 const Router = require('@koa/router')
 const routes = new Router()
 const { makeRequest } = require('./utils')
+const util = require('util')
+const setTimeoutPromise = util.promisify(setTimeout)
+const cpuSampler = require('./utils/cpu')
+
+const MAX_SEGMENTS = 700
+
+async function doWork() {
+  await setTimeoutPromise(1)
+}
 
 const PORT = 8089
+
+const cpuState = {
+  cpuUser: 0.0,
+  cpuSystem: 0.0,
+  count: 0
+}
+
+cpuSampler.start(cpuState)
 
 const handler = async (ctx, next) => {
   const options = {
@@ -15,16 +33,21 @@ const handler = async (ctx, next) => {
     path: '/',
     method: 'GET'
   }
-  let result = await makeRequest(options)
-  console.log(result)
+  // console.log(result)
+  // for (let i = 0; i < MAX_SEGMENTS; i++) {
+  //   await newrelic.startSegment(`Segment ${i}`, false, doWork)
+  // }
 
-  ctx.body =result
+  let result = await makeRequest(options)
+  ctx.body = result
 
   return next()
 }
 
 routes.get('/', handler)
 routes.get('/kill', (ctx) => {
+  cpuSampler.stop()
+  console.log(cpuState)
   process.exit(0)
 })
 

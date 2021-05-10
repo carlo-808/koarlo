@@ -4,9 +4,13 @@
   "description": "Simple Koa",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node -r newrelic index.js",
+    "start-diag": "node --report-on-signal -r newrelic index.js",
+    "start-no-agent": "node index.js",
     "prof-agent": "node --prof -r newrelic index.js",
-    "prof-no-agent": "node --prof index.js"
+    "cpu-prof-agent": "node --cpu-prof -r newrelic index.js",
+    "prof-no-agent": "node --prof index.js",
+    "cpu-prof-no-agent": "node --cpu-prof index.js"
   },
   "author": "",
   "license": "ISC",
